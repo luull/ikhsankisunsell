@@ -3,7 +3,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\Admin\ListTransactionController;
+use App\Http\Controllers\User\ListUserTransactionController;
 
 
 Route::get('/', function () {
@@ -43,11 +46,16 @@ Route::get('/home', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
-});
+    Route::get('/produk', [ProductsController::class, 'showProduct'])->name('produk');
+    Route::get('/user/transactions', [ListUserTransactionController::class, 'index'])->name('user.transactions');
+    Route::post('/user/transactions/{id}/upload-proof', [ListUserTransactionController::class, 'uploadTransferProof'])->name('user.uploadTransferProof');
+    
+    Route::get('/admin/transactions', [ListTransactionController::class, 'showTransactions'])->name('admin.transactions');
+    Route::patch('/admin/transactions/{id}/approve', [ListTransactionController::class, 'approveTransaction'])->name('admin.approveTransaction');
+    Route::patch('/admin/transactions/{id}/reject', [ListTransactionController::class, 'rejectTransaction'])->name('admin.rejectTransaction');
+    Route::post('/approve-transaction/{id}', [ListTransactionController::class, 'approveTransactionToThirdParty']);
 
-Route::get('/produk', function () {
-    return view('home.product');
-})->middleware('auth')->name('produk');
+});
 
 Route::get('/transaction/create', [TransactionController::class, 'create'])->name('transaction.create');
 Route::post('/transaction/store', [TransactionController::class, 'store'])->name('transaction.store');

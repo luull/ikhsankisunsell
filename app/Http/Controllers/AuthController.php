@@ -14,7 +14,7 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    protected function register(Request $request)
+    public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|min:5|max:20|unique:users,name',
@@ -50,17 +50,22 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+
+            $user = Auth::user(); 
+
+            session(['user_data' => $user]);
             return redirect()->route('beranda');
         }
-
         return back()->withErrors([
             'email' => 'Email ini belum terdaftar.',
-            'password' =>'Email belum terdaftar atau Sandi anda salah',
+            'password' => 'Email belum terdaftar atau Sandi anda salah',
         ]);
     }
+    
 
-    public function logout()
+    public function logout(Request $request)
     {
+        $request->session()->forget('user_data');
         Auth::logout();
         return redirect()->route('landingpage');
     }
